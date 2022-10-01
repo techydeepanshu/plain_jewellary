@@ -1,8 +1,8 @@
 import React from 'react'
 import AddNewItems from './AddNewItems'
 import AddSuppliers from './Addsuppliers'
-import Sidebar from './Sidebar'
-import './styles.css'
+import Sidebar from '../Sidebar'
+import '../styles.css'
 
 const UserFormAddSupplier = () => {
   return (

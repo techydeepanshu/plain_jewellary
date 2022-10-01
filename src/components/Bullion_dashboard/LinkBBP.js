@@ -2,7 +2,7 @@ import React,{useState} from "react";
 // import Navbar from "./Navbar";
 // import { useDemoData } from "@mui/x-data-grid-generator";
 // import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import Sidebar from "./Sidebar";
+import Sidebar from "../Sidebar";
 
 const LinkBBP = () => {
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import AddNewItems from './AddNewItems'
-import Sidebar from './Sidebar'
+import Sidebar from '../Sidebar'
 
 
 const AddNewItem = () => {

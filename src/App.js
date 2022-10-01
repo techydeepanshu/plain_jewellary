@@ -2,17 +2,19 @@ import Sidebar from "./components/Sidebar";
 import { useState } from "react";
 import styled from 'styled-components'
 import { BrowserRouter as Router, Switch, Route, Link, Routes } from "react-router-dom";
-import NewCombination from "./components/NewCombination";
-import LinkBBP from "./components/LinkBBP";
-import UseFormAddSupplier from "./components/AddSupplier";
-import AddNewItem from "./components/AddNewItem";
-import Inquiry from "./components/Inquiry";
-import OrderToSupplier from "./components/OrderToSupplier";
-import PurchaseNewOrder from "./components/PurchaseNewOrder";
-import BullionInvoice from "./components/BullionInvoice"
-import BullionReciept from "./components/BullionReciept";
-import Dashboard from "./components/Dashboard";
-
+import NewCombination from "./components/Bullion_dashboard/NewCombination";
+import LinkBBP from "./components/Bullion_dashboard/LinkBBP";
+import UseFormAddSupplier from "./components/Bullion_dashboard/AddSupplier";
+import AddNewItem from "./components/Bullion_dashboard/AddNewItem";
+import Inquiry from "./components/Bullion_dashboard/Inquiry";
+import OrderToSupplier from "./components/Bullion_dashboard/OrderToSupplier";
+import PurchaseNewOrder from "./components/Bullion_dashboard/PurchaseNewOrder";
+import BullionInvoice from "./components/Bullion_dashboard/BullionInvoice"
+import BullionReciept from "./components/Bullion_dashboard/BullionReciept";
+import Dashboard from "./components/Bullion_dashboard/Dashboard";
+import Dashboard_jewellery from "./components/Jewellery_dashboard/Dashboard_jewellery";
+import ClientData from "./components/Jewellery_dashboard/ClientData"
+import PDF_Creation from "./components/Jewellery_dashboard/PDF_Creation";
 
 const drawerWidth = 280;
 
@@ -27,13 +29,6 @@ const drawerWidth = 280;
     padding - left:0;
     }
   `
-
-
-
-
-
-
-
 
   return (
 
@@ -52,6 +47,13 @@ const drawerWidth = 280;
         <Route path="/BullionInvoice" element={<BullionInvoice />} />
         <Route path="/BullionReciept" element={<BullionReciept />} />
         <Route path="/home" element={<Dashboard />} />
+        
+        
+        {/* jewellery dashboard navigatoin */}
+        <Route path="/home_jewellery" element={<Dashboard_jewellery />} />
+        <Route path="/ClientData" element={<ClientData />} />
+        <Route path="/PDF_Creation" element={<PDF_Creation />} />
+
       </Routes>
     </Router>
   </Section>

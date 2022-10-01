@@ -1,0 +1,591 @@
+import React, { useContext, useState } from 'react'
+import Sidebar from '../Sidebar'
+import styled from 'styled-components'
+import { dataContext } from '../helpers/context'
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
+import Button from '@mui/material/Button';
+import { auth, firebase } from '../../firebase';
+import TextField from '@mui/material/TextField';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+// import  "firebase/app";
+
+// import { getAuth, signInWithPhoneNumber ,RecaptchaVerifier} from "firebase/auth";
+
+// const phoneNumber = getPhoneNumberFromUserTextField();
+
+
+
+
+const ClientData = () => {
+    const { formValues } = useContext(dataContext);
+    console.log(formValues, "formvalues")
+
+    const [formData, setFormData] = useState({
+        title: "MR",
+        client_id: "XXXXXXX",
+        first_name: "",
+        surname: "",
+        house_name: "",
+        address_l2: "",
+        city_and_town: "",
+        postcode: "",
+        telephone: "",
+        mobile: "+917206685433",
+        email: "",
+
+
+        // other_details
+
+        relation_OD: "",
+        name_OD: "",
+        surname_OD: "",
+        comments_OD: "",
+        email_OD: "",
+        mobile_OD: "",
+        consent: false
+
+    })
+
+    const [formDataError, setFormDataError] = React.useState({
+        first_nameErr: false,
+        surnameErr: false,
+        emailErr: false,
+        mobileErr: false,
+        telephoneErr: false
+    });
+    const [mynumber, setnumber] = useState("7206685433");
+    const [otp, setotp] = useState('');
+    const [show, setshow] = useState(false);
+    const [final, setfinal] = useState('');
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    console.log("location : ", location.state)
+    const Select = styled.select`
+    width:100%;
+    padding:0;
+    margin:0;
+    `
+    const Option = styled.option`
+    padding:0;
+    margin:0;
+    `
+
+    function handleChange(key, value) {
+        setFormData((prev) => {
+            return {
+                ...prev,
+                [key]: value
+            }
+        })
+    }
+
+    //     const configureCaptcha = () => {
+    //         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sign-in-button', {
+    //             'size': 'invisible',
+    //             'callback': (response) => {
+    //                 // reCAPTCHA solved, allow signInWithPhoneNumber.
+    //                 this.onSignInSubmit();
+    //                 console.log("Recaptca varified")
+    //             },
+    //             defaultCountry: "IN"
+    //         });
+    //     }
+
+
+    //     const onSignInSubmit = (e) => {
+    //         // e.preventDefault()
+    //         configureCaptcha()
+    //         const phoneNumber = "+91" + mynumber
+    //         console.log(phoneNumber)
+    //         const appVerifier = window.recaptchaVerifier;
+    //         firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+    //             .then((confirmationResult) => {
+    //                 // SMS sent. Prompt user to type the code from the message, then sign the
+    //                 // user in with confirmationResult.confirm(code).
+    //                 window.confirmationResult = confirmationResult;
+    //                 console.log("OTP has been sent")
+    //                 // ...
+    //             }).catch((error) => {
+    //                 // Error; SMS not sent
+    //                 // ...
+    //                 console.log("SMS not sent")
+    //             });
+    //     }
+    //     const onSubmitOTP = (e) => {
+    //         // e.preventDefault()
+    //         const code = this.state.otp
+    //         console.log(code)
+    //         window.confirmationResult.confirm(code).then((result) => {
+    //             // User signed in successfully.
+    //             const user = result.user;
+    //             console.log(JSON.stringify(user))
+    //             alert("User is verified")
+    //             // ...
+    //         }).catch((error) => {
+    //             // User couldn't sign in (bad verification code?)
+    //             // ...
+    //         });
+    //     }
+
+
+
+    //    const handleClick = () => {
+    //         let recaptcha = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+
+    //         let number = '+917206685433';
+    //         firebase.auth().signInWithPhoneNumber(number, recaptcha).then(function (e) {
+    //             let code = prompt('enter the otp', '');
+    //             if (code == null) return;
+    //             e.confirm(code).then(function (result) {
+    //                 console.log(result.user, 'user');
+    //                 document.querySelector('label').textContent = result.user.phoneNumber + "Number Verified";
+
+    //             }).catch((error) => {
+    //                 console.log("error : ", error)
+    //             })
+
+    //         })
+    //     }
+
+    const signin = () => {
+        // const auth = getAuth();
+
+        console.log("mynumber : ", mynumber, auth)
+        // console.log("window.recaptchaVerifier : ",window.recaptchaVerifier)
+        // window.recaptchaVerifier = new RecaptchaVerifier('sign-in-button', {
+        //     'size': 'invisible',
+        //     'callback': (response) => {
+        //       // reCAPTCHA solved, allow signInWithPhoneNumber.
+        //     //   onSignInSubmit();
+        //     console.log("done")
+        //     }
+        //   }, auth);
+
+        let verify = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+        //   const appVerifier = window.verify;
+
+        auth.signInWithPhoneNumber(mynumber, verify)
+            .then((confirmationResult) => {
+                // SMS sent. Prompt user to type the code from the message, then sign the
+                // user in with confirmationResult.confirm(code).
+                // window.confirmationResult = confirmationResult;
+                // ...
+                console.log("otp sent", confirmationResult)
+            }).catch((error) => {
+                // Error; SMS not sent
+                // ...
+                console.log("error : ", error)
+            });
+
+
+    }
+
+
+    const saveDataInDB = async () => {
+        console.log("formData : ", formData)
+
+       await fetch("http://localhost:4000/insertclientdata", {
+            method: "post",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData)
+        }
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                console.log("data supplier > ", data)
+                if (data.success == false) {
+                    alert("API failed")
+                } else {
+                   alert("Data Insert Successfully")
+
+                       
+                   navigate('/PDF_Creation',{state:{products:location.state,customer_info:formData}})
+                  
+                }
+            });
+
+        console.log("end")
+    }
+
+
+    const columns = [
+        
+        {
+            field: "item", headerName: "ITEM", width: 120,
+
+        },
+        {
+            field: "item_type", headerName: "ITEM TYPE", width: 120,
+
+
+        },
+        {
+            field: "product_sub_category", headerName: "PRODUCT SUB CATEGORY", width: 120,
+
+        },
+        { field: "Wt_est", headerName: "WT EST", width: 120 },
+
+        {
+            field: "ref_su", headerName: "REF SU", width: 120,
+
+        },
+        { field: "product_ref", headerName: "PRODUCT REF", width: 120 },
+        { field: "price", headerName: "PRICE", width: 120 },
+        {
+            field: "product_size", headerName: "PRODUCT SIZE", width: 120,
+
+        },
+        {
+            field: "metal_selected", headerName: "Metal", width: 120,
+
+        },
+        {
+            field: "TodayDate", headerName: "Time & Date", width: 120,
+
+        },
+        {
+            field: "notes_selected", headerName: "Notes", width: 120,
+
+        }
+
+
+    ];
+
+    const rows = location.state?.map((row) => ({
+
+        item_id: row.item_id,
+        TodayDate: row.TodayDate,
+        item: row.item,
+        dropdown: row.item_type_selected,
+        item_type: row.item_type_selected,
+        product_sub_category: row.product_sub_cat_selected,
+        ref_su: row.supplier_selected,
+        Wt_est: row.Wt_est,
+        product_ref: row.product_ref,
+        price: row.price,
+        product_size_dropdown: row.product_size_selected,
+        metal_selected:row.metal_selected,
+        notes_selected:row.notes_selected,
+        product_size:row.product_size_selected
+    }));
+    return (
+        <>
+            <Sidebar />
+            <div className='container-fluid' style={{ backgroundColor: "" }}>
+                <div className="row">
+                    <p className='bg-secondary text-white py-2'>Client Data</p>
+                </div>
+
+                <form className='p-4' >
+                    <div className="container" style={{ backgroundColor: "" }}>
+                        <div className="row">
+                            <div className="col-lg-6 g-0">
+                                <table className="table-border">
+                                    <tbody>
+                                        <tr>
+
+                                            <th><b>Title</b></th>
+                                            <th>
+                                                <select class="form-control rounded-0" id="exampleFormControlSelect1"
+                                                    value={formData.title}
+                                                    onChange={(e) => {
+                                                        handleChange("title", e.target.value)
+                                                    }}
+                                                >
+                                                    <option>MR</option>
+                                                    <option>MRS</option>
+                                                    <option>MISS</option>
+                                                    <option>DR</option>
+                                                    <option>OTHER</option>
+                                                </select>
+                                            </th>
+                                        </tr>
+                                        <tr>
+                                            <td ><b>CLINT ID</b></td>
+                                            <td >{formData.client_id}</td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col"><b>First Name*</b></td>
+                                            <td scope="col"><TextField
+                                                value={formData.first_name}
+                                                error={formDataError.first_nameErr}
+                                                onChange={(e) => {
+                                                    console.log("e : ", e.target.value)
+                                                    handleChange("first_name", e.target.value)
+                                                    if (e.target.value != "") {
+                                                        setFormDataError(prev => {
+                                                            // console.log("text : ",text)
+                                                            return { ...prev, first_nameErr: false };
+                                                        })
+                                                    }
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col"><b>Surname*</b></td>
+                                            <td scope="col"><TextField
+                                                value={formData.surname}
+                                                error={formDataError.surnameErr}
+                                                onChange={(e) => {
+                                                    handleChange("surname", e.target.value)
+                                                    if (e.target.value != "") {
+                                                        setFormDataError(prev => {
+                                                            // console.log("text : ",text)
+                                                            return { ...prev, surnameErr: false };
+                                                        })
+                                                    }
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col"><b>House Name</b></td>
+                                            <td scope="col"><TextField
+                                                value={formData.house_name}
+                                                onChange={(e) => {
+                                                    handleChange("house_name", e.target.value)
+
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col"><b>Address L2</b></td>
+                                            <td scope="col"><TextField
+                                                value={formData.address_l2}
+                                                onChange={(e) => {
+                                                    handleChange("address_l2", e.target.value)
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col"><b>City/Town</b></td>
+                                            <td scope="col"><TextField
+                                                value={formData.city_and_town}
+                                                onChange={(e) => {
+                                                    handleChange("city_and_town", e.target.value)
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col"><b>Postcode</b></td>
+                                            <td scope="col"><TextField
+                                                value={formData.postcode}
+                                                onChange={(e) => {
+                                                    handleChange("postcode", e.target.value)
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col">Telephone*</td>
+                                            <td scope="col"><TextField
+                                                value={formData.telephone}
+                                                error={formDataError.telephoneErr}
+                                                onChange={(e) => {
+                                                    handleChange("telephone", e.target.value)
+                                                    if (e.target.value != "") {
+                                                        setFormDataError(prev => {
+                                                            // console.log("text : ",text)
+                                                            return { ...prev, telephoneErr: false };
+                                                        })
+                                                    }
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col"><b>Mobile*</b></td>
+                                            <td scope="col"><TextField
+                                                value={formData.mobile}
+                                                error={formDataError.mobileErr}
+                                                onChange={(e) => {
+                                                    handleChange("mobile", e.target.value)
+                                                    if (e.target.value != "") {
+                                                        setFormDataError(prev => {
+                                                            // console.log("text : ",text)
+                                                            return { ...prev, mobileErr: false };
+                                                        })
+                                                    }
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td scope="col"><b>Email*</b></td>
+                                            <td scope="col"><TextField
+                                                value={formData.email}
+                                                error={formDataError.emailErr}
+                                                onChange={(e) => {
+                                                    handleChange("email", e.target.value)
+                                                    if (e.target.value != "") {
+                                                        setFormDataError(prev => {
+                                                            // console.log("text : ",text)
+                                                            return { ...prev, emailErr: false };
+                                                        })
+                                                    }
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="col-lg-6 g-0">
+                                <table className="table-border">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="2"><b>Others Details:</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Relation</b></td>
+                                            <td ><select class="form-control rounded-0" id="exampleFormControlSelect1"
+                                                value={formData.relation_OD}
+                                                onChange={(e) => {
+                                                    handleChange("relation_OD", e.target.value)
+                                                }}
+                                            >
+                                                <option>PARTNER</option>
+                                                <option>WIFE</option>
+                                                <option>HUSBAND</option>
+                                                <option>FRIEND</option>
+                                                <option>EDITABLE AUTO ADD NEW</option>
+                                            </select></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Name</b></td>
+                                            <td ><TextField
+                                                value={formData.name_OD}
+                                                onChange={(e) => {
+                                                    handleChange("name_OD", e.target.value)
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Surname</b></td>
+                                            <td ><TextField
+                                                value={formData.surname_OD}
+                                                onChange={(e) => {
+                                                    handleChange("surname_OD", e.target.value)
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Comments</b></td>
+                                            <td><TextField
+                                                value={formData.comments_OD}
+                                                onChange={(e) => {
+                                                    handleChange("comments_OD", e.target.value)
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Mobile</b></td>
+                                            <td><TextField></TextField></td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>Email</b></td>
+                                            <td><TextField
+                                                value={formData.email_OD}
+                                                onChange={(e) => {
+                                                    handleChange("email_OD", e.target.value)
+                                                }}
+                                            ></TextField></td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <br />
+                        
+                    </div>
+                </form>
+
+                {location.state ? (
+                    <DataGrid
+                      style={{ height: "28rem", width: "100%" }}
+                      rows={rows}
+                      columns={columns}
+                      pageSize={20}
+                      getRowId={(row) => row.item_id}
+                      rowsPerPageOptions={[20]}
+                      components={{ Toolbar: GridToolbar }}
+                    />
+                  ) : (
+                    <center>
+                      <h2>Loading.... </h2>
+                    </center>
+                  )}
+                  <div className="row" style={{padding:"30px 0 30px 0"}}>
+                            <div className="col-12">
+                                <b><input type="checkbox"
+                                    onClick={(e) => {
+                                        console.log("checkbox : ", e.target.value)
+                                        handleChange("consent", !formData.consent)
+                                    }}
+                                ></input> I consent to marketing from Muljis Jewellers by post / <em>email</em> / <em>telephone</em> / <em>whats app</em></b>
+
+                            </div>
+                        </div>
+                <div style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "25px"
+                }}>
+                    <Button variant="contained"
+
+                        onClick={() => {
+                            console.log("button : ", formData)
+                            //    navigate.goback()
+                            navigate(-1)
+                        }}
+                    >Go Back</Button>
+                    <Button variant="contained"
+                        disabled={!formData.consent}
+                        onClick={() => {
+                            console.log("button : ", formData)
+                            // signin()
+                            // signin()
+                            // onSignInSubmit()
+                            // if(formData)
+                            if (formData.first_name == "") {
+                                setFormDataError(prev => {
+                                    return { ...prev, first_nameErr: true };
+                                })
+                            }
+                            if (formData.surname == "") {
+                                setFormDataError(prev => {
+                                    return { ...prev, surnameErr: true };
+                                })
+                            }
+                            if (formData.mobile == "+91") {
+                                setFormDataError(prev => {
+                                    return { ...prev, mobileErr: true };
+                                })
+                            }
+                            if (formData.email == "") {
+                                setFormDataError(prev => {
+                                    return { ...prev, emailErr: true };
+                                })
+                            }
+                            if (formData.telephone == "") {
+                                setFormDataError(prev => {
+                                    return { ...prev, telephoneErr: true };
+                                })
+                            }
+                            if (formData.first_name !== "" && formData.surname !== "" && formData.mobile !== "" && formData.email !== "") {
+
+                                saveDataInDB()
+                            } else {
+                                alert("Form fill properly")
+                            }
+
+                            navigate("/PDF_Creation")
+
+                        }}
+                    >Next</Button>
+                </div>
+            </div>
+        </>
+    )
+}
+
+export default ClientData

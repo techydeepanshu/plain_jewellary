@@ -15,14 +15,17 @@ import { Dashboard, Dvr, JoinFull, LeakAdd, ManageSearch, PersonAdd, PostAdd, St
 import styled from 'styled-components'
 import { ListItem } from '@mui/material';
 import ReceiptIcon from '@mui/icons-material/Receipt';
-import AddNewItems from './AddNewItems';
-import AddSuppliers from './Addsuppliers';
+import AddNewItems from './Bullion_dashboard/AddNewItems';
+import AddSuppliers from './Bullion_dashboard/Addsuppliers';
 import DashboardIcon from '@mui/icons-material/Dashboard';
-
+import Header from './Header/Header';
+import Switch from '@mui/material/Switch';
+import Bullion_dashboard from './Bullion_dashboard/Dashboards/Bullion_dashboard';
+import Jewellery_dashboard from './Jewellery_dashboard/Dashboards/Jewellery_dashboard';
 
 
 const drawerWidth = 280;
-
+const label = { inputProps: { 'aria-label': 'Switch demo' } };
 function Sidebar(props) {
 
     const Links = styled(Link)`
@@ -41,12 +44,11 @@ function Sidebar(props) {
         color:white;
     }
     `
-
-
-
     const { window } = props;
     const [mobileOpen, setMobileOpen] = useState(false);
     const [selector, setSelector] = useState('');
+
+    const [switchDashboard, setSwitchDashboard] = useState(true)
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -56,83 +58,80 @@ function Sidebar(props) {
         setSelector(index)
     }
 
-
-
-
-    const drawerList = (
-        <div>
-            <List>
-                <ListItem >
-                    <Dashboard />
-                    <Links to='/home' >Dashboard</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <JoinFull />
-                    <Links to='/' >New Combination</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <LeakAdd />
-                    <Links to='/listbbp' >BBP</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <PersonAdd />
-                    {/* <AddSuppliers /> */}
-                    <Links to='/userformaddsupplier' >Add Supplier</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <PostAdd />
-                    <Links to='/addnewitem' >Add New Item</Links>
-                    {/* <AddNewItems /> */}
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <ManageSearch />
-                    <Links to='/inquiry' >Inquiry</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <Dvr /><Links to='/ordertosupplier' >Order To Supplier</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <Store /><Links to='/purchaseordernew' >Purchase Order New</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem >
-                    <ReceiptIcon />
-                    <Links to='/BullionInvoice' >Invoice</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem >
-                    <ReceiptIcon />
-                    <Links to='/BullionReciept' >Receipt</Links>
-                </ListItem>
-            </List>
-            <Divider />
-        </div >
-    );
+    // const drawerList = (
+    //     <div>
+    //         <List>
+    //             <ListItem >
+    //                 <Dashboard />
+    //                 <Links to='/home' >Dashboard</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem>
+    //                 <JoinFull />
+    //                 <Links to='/' >New Combination</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem>
+    //                 <LeakAdd />
+    //                 <Links to='/listbbp' >BBP</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem>
+    //                 <PersonAdd />
+    //                 {/* <AddSuppliers /> */}
+    //                 <Links to='/userformaddsupplier' >Add Supplier</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem>
+    //                 <PostAdd />
+    //                 <Links to='/addnewitem' >Add New Item</Links>
+    //                 {/* <AddNewItems /> */}
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem>
+    //                 <ManageSearch />
+    //                 <Links to='/inquiry' >Inquiry</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem>
+    //                 <Dvr /><Links to='/ordertosupplier' >Order To Supplier</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem>
+    //                 <Store /><Links to='/purchaseordernew' >Purchase Order New</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem >
+    //                 <ReceiptIcon />
+    //                 <Links to='/BullionInvoice' >Invoice</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //         <List>
+    //             <ListItem >
+    //                 <ReceiptIcon />
+    //                 <Links to='/BullionReciept' >Receipt</Links>
+    //             </ListItem>
+    //         </List>
+    //         <Divider />
+    //     </div >
+    // );
 
     const container = window !== undefined ? () => window().document.body : undefined;
 
@@ -147,7 +146,7 @@ function Sidebar(props) {
                     backgroundColor: "#2196f3"
                 }}
             >
-                <Toolbar>
+                <Toolbar style={{ display: "flex", justifyContent: "space-between" }}>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
@@ -162,45 +161,23 @@ function Sidebar(props) {
                         noWrap
                         component="div"
                     >
-                        Bullion Dashboard
+                     Jewellery Dashboard
                     </Typography>
+                    {/*<div style={{ display: "flex", flexDirection: "row", alignItems: "baseline" }}>
+                        <p>Switch Dashboard</p>
+                        <Switch {...label}
+                            checked={switchDashboard}
+                            onChange={(e) => {
+                                console.log("switch : ", e)
+                                setSwitchDashboard(!switchDashboard)
+                            }}
+                        />
+                        </div>*/}
                 </Toolbar>
             </AppBar>
-            <Box sx={{ display: 'flex', }}>
-                <Box
-                    component="nav"
-                    sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-                    aria-label="mailbox folders"
-                >
-                    {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-                    <Drawer
-                        container={container}
-                        variant="temporary"
-                        open={mobileOpen}
-                        onClose={handleDrawerToggle}
-                        ModalProps={{
-                            keepMounted: false, // Better open performance on mobile.
-                        }}
-                        sx={{
-                            display: { xs: 'block', sm: 'none' },
-                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, }
-                        }}
-                    >
-                        {drawerList}
-                    </Drawer>
-                    <Drawer
-                        variant="permanent"
-                        sx={{
-                            display: { xs: 'none', sm: 'block' },
-                            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, marginTop: "64px", zIndex: "45" },
-                        }}
-                        open
-                    >
-                        {drawerList}
-                    </Drawer>
-                </Box>
-
-            </Box>
+            
+                <Jewellery_dashboard/>
+            
         </>
     );
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 // import Navbar from "./Navbar";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import Sidebar from "./Sidebar";
+import Sidebar from "../Sidebar";
 
 const Dashboard = () => {
   const [data2, setData] = useState();

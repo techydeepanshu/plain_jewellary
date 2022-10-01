@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 // import "./newcombination.css";
 // import Navbar from "./Navbar";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import Sidebar from "./Sidebar";
+import Sidebar from "../Sidebar";
 import { Divider } from "@mui/material";
 
 const NewCombination = () => {
