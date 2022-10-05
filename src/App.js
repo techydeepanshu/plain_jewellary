@@ -15,11 +15,13 @@ import Dashboard from "./components/Bullion_dashboard/Dashboard";
 import Dashboard_jewellery from "./components/Jewellery_dashboard/Dashboard_jewellery";
 import ClientData from "./components/Jewellery_dashboard/ClientData"
 import PDF_Creation from "./components/Jewellery_dashboard/PDF_Creation";
-
+import { dataContext } from "./components/helpers/context";
+import Plain_J_Invoice from "./components/Jewellery_dashboard/Plain_J_Invoice";
+import Sale_Reciept from "./components/Jewellery_dashboard/Sale_Reciept";
 const drawerWidth = 280;
 
   function App() {
-
+    const [globleData,setGlobleData] = useState()
   const Section = styled.section`
   margin-top:64px;
   position:relative;
@@ -34,10 +36,11 @@ const drawerWidth = 280;
 
   <>
     {/* <Sidebar /> */}
+    <dataContext.Provider value={{globleData,setGlobleData}}>
     <Section >
     <Router>
       <Routes>
-        <Route path="/" element={<NewCombination />} />
+        <Route path="/NewCombination" element={<NewCombination />} />
         <Route path="/listbbp" element={<LinkBBP />} />
         <Route path="/userformaddsupplier" element={<UseFormAddSupplier />} />
         <Route path="/addnewitem" element={<AddNewItem />} />
@@ -50,13 +53,16 @@ const drawerWidth = 280;
         
         
         {/* jewellery dashboard navigatoin */}
-        <Route path="/home_jewellery" element={<Dashboard_jewellery />} />
+        <Route path="/" element={<Dashboard_jewellery />} />
         <Route path="/ClientData" element={<ClientData />} />
         <Route path="/PDF_Creation" element={<PDF_Creation />} />
+        <Route path="/Plain_J_Invoice" element={<Plain_J_Invoice />} />
+        <Route path="/Sale_Reciept" element={<Sale_Reciept />} />
 
       </Routes>
     </Router>
   </Section>
+  </dataContext.Provider>
 </>
   );
 }

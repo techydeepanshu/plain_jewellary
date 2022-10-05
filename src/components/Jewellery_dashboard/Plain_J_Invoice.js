@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import Sidebar from '../Sidebar'
 import styled from 'styled-components'
-import  {dataContext} from '../helpers/context'
+import { dataContext } from '../helpers/context'
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Button from '@mui/material/Button';
 import { auth, firebase } from '../../firebase';
@@ -18,8 +18,8 @@ import Backdrop from '@mui/material/Backdrop';
 
 
 
-const ClientData = () => {
-    const { globleData,setGlobleData } = useContext(dataContext);
+const Plain_J_Invoice = () => {
+    const { globleData, setGlobleData } = useContext(dataContext);
 
 
     const [formData, setFormData] = useState({
@@ -63,7 +63,16 @@ const ClientData = () => {
     const [loader, setLoader] = useState(false)
     const location = useLocation();
     const navigate = useNavigate();
-    console.log(globleData, "globleData")
+    useEffect(() => {
+        console.log("useEffect : ", globleData)
+        if (globleData != undefined) {
+
+            setFormData(globleData)
+        }
+    }, []);
+
+
+    console.log(globleData, "globleData Plain_J_Invoice")
     console.log("location : ", location.state)
     const Select = styled.select`
     width:100%;
@@ -186,73 +195,11 @@ const ClientData = () => {
     }
 
 
-    // const saveDataInDB =  () => {
-    //     console.log("formData : ", formData)
-
-    //     setLoader(true)
-    //    fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/insertclientdata`, {
-    //         method: "post",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify(formData)
-    //     }
-    //     )
-    //         .then((res) => res.json())
-    //         .then((data) => {
-    //             console.log("save client data > ", data)
-    //             if (data.success == false) {
-    //                 alert("API failed (save client data)")
-    //                 setLoader(false)
-    //             } else {
-    //                 alert("Data Insert Successfully")
-
-
-    //                 setFormData((prev) => {
-    //                     return { ...prev, client_id: parseInt(data.res.rows[0].client_id) }
-    //                 })
-    //                 fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/createorder`, {
-    //                     method: "post",
-    //                     headers: { "Content-Type": "application/json" },
-    //                     body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id) }, products: location.state })
-    //                 }
-    //                 )
-    //                     .then((res) => res.json())
-    //                     .then((response) => {
-    //                         console.log("craete order data > ", response)
-    //                         if (response.success == false) {
-    //                             alert("API failed (create order)")
-    //                             setLoader(false)
-    //                         } else {
-    //                             alert("Order created Successfully")
-
-
-                               
-                                    
-    //                                 navigate('/PDF_Creation', { state: { products: location.state, customer_info: { ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id) } } })
-                              
-    //                             setLoader(false)
-    //                         }
-    //                     }).catch((err) => {
-    //                         console.log(err);
-    //                         alert("API not working (createorder)")
-    //                         setLoader(false)
-    //                     });
-
-    //                 //    navigate('/PDF_Creation',{state:{products:location.state,customer_info:formData}})
-
-    //             }
-    //         }).catch((err) => {
-    //             console.log(err);
-    //             alert("API not working (insertclientdata)")
-    //             setLoader(false)
-    //         });
-
-    //     console.log("end")
-    // }
-    const saveDataInDB =  () => {
+    const saveDataInDB = () => {
         console.log("formData : ", formData)
 
         setLoader(true)
-       fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/insertclientdata`, {
+        fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/insertclientdata`, {
             method: "post",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData)
@@ -269,12 +216,12 @@ const ClientData = () => {
 
 
                     setFormData((prev) => {
-                        return { ...prev, client_id: parseInt(data.res.rows[0].client_id),TodayDate:location.state[0].TodayDate }
+                        return { ...prev, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }
                     })
                     fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/createorder`, {
                         method: "post",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id),TodayDate:location.state[0].TodayDate }, products: location.state })
+                        body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }, products: location.state })
                     }
                     )
                         .then((res) => res.json())
@@ -287,10 +234,10 @@ const ClientData = () => {
                                 alert("Order created Successfully")
 
 
-                                setGlobleData({ ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id),TodayDate:location.state[0].TodayDate })
-                                    console.log("trigger")
-                                    navigate('/PDF_Creation', { state: { products: location.state, customer_info: { ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id),TodayDate:location.state[0].TodayDate } } })
-                              
+                                setGlobleData({ ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate })
+                                console.log("trigger")
+                                navigate('/PDF_Creation', { state: { products: location.state, customer_info: { ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate } } })
+
                                 setLoader(false)
                             }
                         }).catch((err) => {
@@ -377,7 +324,7 @@ const ClientData = () => {
             <Sidebar />
             <div className='container-fluid' style={{ backgroundColor: "" }}>
                 <div className="row">
-                    <p className='bg-secondary text-white py-2'>Client Data</p>
+                    <p className='bg-secondary text-white py-2'>Plain J Invoice</p>
                 </div>
 
                 <form className='p-4' >
@@ -386,27 +333,22 @@ const ClientData = () => {
                             <div className="col-lg-6 g-0">
                                 <table className="table-border">
                                     <tbody>
-                                        <tr>
 
-                                            <th><b>Title</b></th>
-                                            <th>
+                                        <tr>
+                                            <td ><b>CLINT ID</b></td>
+                                            <td >
                                                 <select class="form-control rounded-0" id="exampleFormControlSelect1"
-                                                    value={formData.title}
+                                                    // value={formData.title}
+                                                    value="13123"
                                                     onChange={(e) => {
                                                         handleChange("title", e.target.value)
                                                     }}
                                                 >
-                                                    <option>MR</option>
-                                                    <option>MRS</option>
-                                                    <option>MISS</option>
-                                                    <option>DR</option>
-                                                    <option>OTHER</option>
+                                                    <option>121_Deepanshu_7206685433</option>
+                                                    <option>123_Deepanshu_3221233222</option>
+
                                                 </select>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <td ><b>CLINT ID</b></td>
-                                            <td >XXXXXXX</td>
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td scope="col"><b>First Name*</b></td>
@@ -442,7 +384,7 @@ const ClientData = () => {
                                             ></TextField></td>
                                         </tr>
                                         <tr>
-                                            <td scope="col"><b>House Name</b></td>
+                                            <td scope="col"><b>Number</b></td>
                                             <td scope="col"><TextField
                                                 value={formData.house_name}
                                                 onChange={(e) => {
@@ -452,14 +394,16 @@ const ClientData = () => {
                                             ></TextField></td>
                                         </tr>
                                         <tr>
-                                            <td scope="col"><b>Address L2</b></td>
+                                            <td scope="col"><b>Road/Street</b></td>
                                             <td scope="col"><TextField
-                                                value={formData.address_l2}
+                                                value={formData.house_name}
                                                 onChange={(e) => {
-                                                    handleChange("address_l2", e.target.value)
+                                                    handleChange("house_name", e.target.value)
+
                                                 }}
                                             ></TextField></td>
                                         </tr>
+
                                         <tr>
                                             <td scope="col"><b>City/Town</b></td>
                                             <td scope="col"><TextField
@@ -478,22 +422,7 @@ const ClientData = () => {
                                                 }}
                                             ></TextField></td>
                                         </tr>
-                                        <tr>
-                                            <td scope="col">Telephone*</td>
-                                            <td scope="col"><TextField
-                                                value={formData.telephone}
-                                                error={formDataError.telephoneErr}
-                                                onChange={(e) => {
-                                                    handleChange("telephone", e.target.value)
-                                                    if (e.target.value != "") {
-                                                        setFormDataError(prev => {
-                                                            // console.log("text : ",text)
-                                                            return { ...prev, telephoneErr: false };
-                                                        })
-                                                    }
-                                                }}
-                                            ></TextField></td>
-                                        </tr>
+
                                         <tr>
                                             <td scope="col"><b>Mobile*</b></td>
                                             <td scope="col"><TextField
@@ -533,26 +462,9 @@ const ClientData = () => {
                             <div className="col-lg-6 g-0">
                                 <table className="table-border">
                                     <tbody>
+
                                         <tr>
-                                            <td colspan="2"><b>Others Details:</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Relation</b></td>
-                                            <td ><select class="form-control rounded-0" id="exampleFormControlSelect1"
-                                                value={formData.relation_OD}
-                                                onChange={(e) => {
-                                                    handleChange("relation_OD", e.target.value)
-                                                }}
-                                            >
-                                                <option>PARTNER</option>
-                                                <option>WIFE</option>
-                                                <option>HUSBAND</option>
-                                                <option>FRIEND</option>
-                                                <option>EDITABLE AUTO ADD NEW</option>
-                                            </select></td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Name</b></td>
+                                            <td><b>Date:</b></td>
                                             <td ><TextField
                                                 value={formData.name_OD}
                                                 onChange={(e) => {
@@ -561,39 +473,116 @@ const ClientData = () => {
                                             ></TextField></td>
                                         </tr>
                                         <tr>
-                                            <td><b>Surname</b></td>
+                                            <td><b>Invoice Number:</b></td>
                                             <td ><TextField
-                                                value={formData.surname_OD}
+                                                value={formData.name_OD}
                                                 onChange={(e) => {
-                                                    handleChange("surname_OD", e.target.value)
+                                                    handleChange("name_OD", e.target.value)
                                                 }}
                                             ></TextField></td>
                                         </tr>
                                         <tr>
-                                            <td><b>Comments</b></td>
-                                            <td><TextField
-                                                value={formData.comments_OD}
-                                                onChange={(e) => {
-                                                    handleChange("comments_OD", e.target.value)
-                                                }}
-                                            ></TextField></td>
+                                            <td><b>SERVED BY</b></td>
+                                            <td ></td>
                                         </tr>
                                         <tr>
-                                            <td><b>Mobile</b></td>
-                                            <td><TextField></TextField></td>
+                                            <td><b>VAT NUMBER</b></td>
+                                            <td>GB 372718438</td>
                                         </tr>
-                                        <tr>
-                                            <td><b>Email</b></td>
-                                            <td><TextField
-                                                value={formData.email_OD}
-                                                onChange={(e) => {
-                                                    handleChange("email_OD", e.target.value)
-                                                }}
-                                            ></TextField></td>
-                                        </tr>
+
+
 
                                     </tbody>
                                 </table>
+                                <div className="col-lg-24 g-0">
+                                    <table className="table-border">
+                                        <tbody>
+
+
+                                            <tr>
+                                                <td><b>Payment Details</b></td>
+                                                <td><b>Amount</b></td>
+                                                <td><b>Remark</b></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>BANK</td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                            <tr>
+                                                <td>CARD</td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                            <tr>
+                                                <td>CASH</td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                            <tr>
+                                                <td>CHEQUE</td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                            <tr>
+                                                <td>EXCHANGE</td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={formData.name_OD}
+                                                    onChange={(e) => {
+                                                        handleChange("name_OD", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <br />
@@ -681,7 +670,7 @@ const ClientData = () => {
                                 alert("Form fill properly")
                             }
 
-                           
+
 
                         }}
                     >Next</Button>
@@ -699,4 +688,4 @@ const ClientData = () => {
     )
 }
 
-export default ClientData
+export default Plain_J_Invoice

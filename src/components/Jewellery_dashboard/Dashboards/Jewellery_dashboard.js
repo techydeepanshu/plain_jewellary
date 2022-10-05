@@ -59,14 +59,21 @@ export default function Jewellery_dashboard(props) {
             <List>
                 <ListItem >
                     <Dashboard />
-                    <Links to='/home_jewellery' >Dashboard</Links>
+                    <Links to='/' >Dashboard</Links>
                 </ListItem>
             </List>
             <Divider />
             <List>
                 <ListItem>
                     <JoinFull />
-                    <Links to='/' >New Combination</Links>
+                    <Links to='/Plain_J_Invoice' >Plain J Invoice</Links>
+                </ListItem>
+            </List>
+            <Divider />
+            <List>
+                <ListItem>
+                    <JoinFull />
+                    <Links to='/Sale_Reciept' >Sale Reciept</Links>
                 </ListItem>
             </List>
             <Divider />
@@ -133,7 +140,7 @@ export default function Jewellery_dashboard(props) {
                 </ListItem>
             </List>
             <Divider />
-            
+
             <Divider />
         </div >
     );
@@ -141,9 +148,9 @@ export default function Jewellery_dashboard(props) {
     const container = window !== undefined ? () => window().document.body : undefined;
 
 
-  return (
-    <div>
-    <Box sx={{ display: 'flex', }}>
+    return (
+        <div>
+            <Box sx={{ display: 'flex', }}>
                 <Box
                     component="nav"
                     sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
@@ -178,6 +185,6 @@ export default function Jewellery_dashboard(props) {
                 </Box>
 
             </Box>
-    </div>
-  )
+        </div>
+    )
 }

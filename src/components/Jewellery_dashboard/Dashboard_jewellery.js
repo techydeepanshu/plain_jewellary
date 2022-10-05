@@ -6,6 +6,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -69,163 +70,168 @@ const Dashboard_jewellery = () => {
   const [storeSupplierData, setStoreSupplierData] = useState([])
   const [storePriceFromAPI, setStorePriceFromAPI] = useState([
     {
-        "metal": "Gold",
-        "TimeStemp": "2022-09-28 12:03:15.385082",
-        "currency": {
-            "GBP": {
-                "bid": "",
-                "offer": ""
-            }
+      "metal": "Gold",
+      "TimeStemp": "2022-09-28 12:03:15.385082",
+      "currency": {
+        "GBP": {
+          "bid": "",
+          "offer": ""
         }
+      }
     },
     {
-        "metal": "Silver",
-        "TimeStemp": "2022-09-28 12:03:15.385082",
-        "currency": {
-            "GBP": {
-                "bid": "",
-                "offer": ""
-            }
+      "metal": "Silver",
+      "TimeStemp": "2022-09-28 12:03:15.385082",
+      "currency": {
+        "GBP": {
+          "bid": "",
+          "offer": ""
         }
+      }
     },
     {
-        "metal": "Platinum",
-        "TimeStemp": "2022-09-28 12:03:15.385082",
-        "currency": {
-            "GBP": {
-                "bid": "",
-                "offer": ""
-            }
+      "metal": "Platinum",
+      "TimeStemp": "2022-09-28 12:03:15.385082",
+      "currency": {
+        "GBP": {
+          "bid": "",
+          "offer": ""
         }
+      }
     },
     {
-        "metal": "Palladium",
-        "TimeStemp": "2022-09-28 12:03:15.385082",
-        "currency": {
-            "GBP": {
-                "bid": "",
-                "offer": ""
-            }
+      "metal": "Palladium",
+      "TimeStemp": "2022-09-28 12:03:15.385082",
+      "currency": {
+        "GBP": {
+          "bid": "",
+          "offer": ""
         }
+      }
     },
     {
-        "metal": "Rhodium",
-        "TimeStemp": "2022-09-28 12:03:15.385082",
-        "currency": {
-            "GBP": {
-                "bid": "",
-                "offer": ""
-            }
+      "metal": "Rhodium",
+      "TimeStemp": "2022-09-28 12:03:15.385082",
+      "currency": {
+        "GBP": {
+          "bid": "",
+          "offer": ""
         }
+      }
     }
-])
+  ])
   const [loader, setLoader] = useState(false)
   const navigate = useNavigate();
   useEffect(() => {
 
-    try{
+    try {
 
       let date = new Date();
       setTodayDate(date.toLocaleDateString())
       const alldata = () => {
+
+
+        console.log(process.env.REACT_APP_SERVER_IP, "SERVER_IP")
         setLoader(true)
-        fetch("http://localhost:4000/dropdown")
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("data > ", data)
-          setStoreBulkData([{
-            items_arr: data[0].item,
-            item_size: data[0].item_size,
-            product_sub_cat: data[0].sub_category,
-            supplier: data[0].supplier_code,
-            item_type: data[0].sub_category.map((e) => {
-              return e.ITEM_TYPE
+        fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/dropdown`)
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("data > ", data)
+            setStoreBulkData([{
+              items_arr: data[0].item,
+              item_size: data[0].item_size,
+              product_sub_cat: data[0].sub_category,
+              supplier: data[0].supplier_code,
+              item_type: data[0].sub_category.map((e) => {
+                return e.ITEM_TYPE
+              })
+            }])
+            let tempData = data[0].item.map((e, i) => {
+              return {
+                item_id: i + 1,
+                item: e
+              }
             })
-          }])
-          let tempData = data[0].item.map((e, i) => {
-            return {
-              item_id: i + 1,
-              item: e
-            }
-          })
-          console.log("tempData : ", tempData)
-          setData(tempData)
-          setProductDropdown(data[0].item)
-          
-          setLoader(false)
-          supplier_data();
-        }).catch((err)=>{
-          alert("API not working");
-          setLoader(false)
-        });
+            console.log("tempData : ", tempData)
+            setData(tempData)
+            setProductDropdown(data[0].item)
+
+            setLoader(false)
+            supplier_data();
+          }).catch((err) => {
+            alert("API not working");
+            setLoader(false)
+            throw Error(err)
+          });
+
         // console.log(data2, "all data");
       };
-      
+
       const getPriceFromAPI = () => {
         setLoader(true)
-        fetch("http://localhost:4000/liveprice")
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("data supplier > ", data)
-          
-          let uniqueElements = [...new Set(data.map(item => item.metal))];
-          console.log(uniqueElements)
-          
-          let temp = []
-          uniqueElements.map((el) => {
-            temp.push(data.filter((e) => e.metal == el).filter((e) => Object.keys(e.currency)[0] == "GBP")[0])
-            
-            console.log("temp : ", temp)
-          })
-          
-          setStorePriceFromAPI(temp)
-          setLoader(false)
-          
-        }).catch((err)=>{
-          console.log("err : ",err)
-          alert("getPriceFromAPI API not working");
-          setLoader(false)
-        });
+        fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/liveprice`)
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("data supplier > ", data)
+
+            let uniqueElements = [...new Set(data.map(item => item.metal))];
+            console.log(uniqueElements)
+
+            let temp = []
+            uniqueElements.map((el) => {
+              temp.push(data.filter((e) => e.metal == el).filter((e) => Object.keys(e.currency)[0] == "GBP")[0])
+
+              console.log("temp : ", temp)
+            })
+
+            setStorePriceFromAPI(temp)
+            setLoader(false)
+
+          }).catch((err) => {
+            console.log("err : ", err)
+            // alert("getPriceFromAPI API not working");
+            setLoader(false)
+          });
         // console.log(data2, "all data");
       };
-      
+
       const supplier_data = () => {
         setLoader(true)
-        fetch("http://localhost:4000/plainstock")
-        .then((res) => res.json())
-        .then((data) => {
-          console.log("data supplier > ", data)
-          setStoreSupplierData(data)
-          setLoader(false)
-          getPriceFromAPI()
-        }).catch((err)=>{
-          alert("supplier API not working");
-          setLoader(false)
-        });
+        fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/plainstock`)
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("data supplier > ", data)
+            setStoreSupplierData(data)
+            setLoader(false)
+            getPriceFromAPI()
+          }).catch((err) => {
+            // alert("supplier API not working");
+            setLoader(false)
+          });
         // console.log(data2, "all data");
       };
-      
-      
-      
-      const mainFun = async () => {
-        await alldata();
-        //  await supplier_data();
-        //  await getPriceFromAPI();
-        
-        
-      }
-      mainFun()
-    }catch(err){
+
+
+
+      alldata();
+      // const mainFun = async () => {
+      //   //  await supplier_data();
+      //   //  await getPriceFromAPI();
+
+
+      // }
+      // mainFun()
+    } catch (err) {
       setLoader(false)
       alert("Some Error Occurred");
 
     }
-      const interval = setInterval(() => {
-        setHit(true);
-      }, 300000);
-      
-      return () => clearInterval(interval);
-    }, []);
+    const interval = setInterval(() => {
+      setHit(true);
+    }, 300000);
+
+    return () => clearInterval(interval);
+  }, []);
 
 
   var to_Delete = "";
@@ -267,16 +273,16 @@ const Dashboard_jewellery = () => {
           product_ref: "",
           price: "",
           product_size_dropdown: [],
-          item_type_selected:"Select Option",
-          product_sub_cat_selected:"Select Option",
-          supplier_selected:"Select Option",
-          product_size_selected:"Select Option",
-          metal_selected:"Select Option",
-          notes_selected:""
+          item_type_selected: "Select Option",
+          product_sub_cat_selected: "Select Option",
+          supplier_selected: "Select Option",
+          product_size_selected: "Select Option",
+          metal_selected: "Select Option",
+          notes_selected: ""
 
         }]);
 
-        
+
         console.log(formValues);
       }
     } else {
@@ -352,7 +358,7 @@ const Dashboard_jewellery = () => {
                     ...obj,
                     product_sub_cat_dropdown: storeBulkData[0].product_sub_cat.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
                     product_size_dropdown: storeBulkData[0].item_size.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
-                    item_type_selected:e.target.value
+                    item_type_selected: e.target.value
 
                   };
                   // return { ...obj, product_sub_cat_dropdown: ["dd","ff"] };
@@ -416,7 +422,7 @@ const Dashboard_jewellery = () => {
                     ...obj,
                     // product_sub_cat_dropdown: storeBulkData[0].product_sub_cat.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
                     // product_size_dropdown: storeBulkData[0].item_size.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
-                    product_sub_cat_selected:e.target.value
+                    product_sub_cat_selected: e.target.value
 
                   };
                   // return { ...obj, product_sub_cat_dropdown: ["dd","ff"] };
@@ -470,7 +476,7 @@ const Dashboard_jewellery = () => {
                     Wt_est: storeSupplierData.filter((el) => el.supplier_id == e.target.value)[0].metal_weight_gm,
                     product_ref: storeSupplierData.filter((el) => el.supplier_id == e.target.value)[0].product_id,
                     price: storeSupplierData.filter((el) => el.supplier_id == e.target.value)[0].total_cost,
-                    supplier_selected:e.target.value
+                    supplier_selected: e.target.value
 
                   };
 
@@ -521,7 +527,7 @@ const Dashboard_jewellery = () => {
                     ...obj,
                     // product_sub_cat_dropdown: storeBulkData[0].product_sub_cat.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
                     // product_size_dropdown: storeBulkData[0].item_size.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
-                    product_size_selected:e.target.value
+                    product_size_selected: e.target.value
 
                   };
                   // return { ...obj, product_sub_cat_dropdown: ["dd","ff"] };
@@ -571,7 +577,7 @@ const Dashboard_jewellery = () => {
                     ...obj,
                     // product_sub_cat_dropdown: storeBulkData[0].product_sub_cat.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
                     // product_size_dropdown: storeBulkData[0].item_size.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
-                    metal_selected:e.target.value
+                    metal_selected: e.target.value
 
                   };
                   // return { ...obj, product_sub_cat_dropdown: ["dd","ff"] };
@@ -633,7 +639,7 @@ const Dashboard_jewellery = () => {
                     ...obj,
                     // product_sub_cat_dropdown: storeBulkData[0].product_sub_cat.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
                     // product_size_dropdown: storeBulkData[0].item_size.filter((elem) => elem.ITEM_TYPE == e.target.value)[0].DROPDOWN,
-                    notes_selected:e.target.value
+                    notes_selected: e.target.value
 
                   };
                   // return { ...obj, product_sub_cat_dropdown: ["dd","ff"] };
@@ -684,7 +690,7 @@ const Dashboard_jewellery = () => {
       <div style={{ padding: 20 }}>
         {/* <Navbar /> */}
         <Sidebar />
-        <div style={{ display: "flex", justifyContent: "space-between",alignItems:"center" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div>
             <select
               style={{
@@ -734,36 +740,36 @@ const Dashboard_jewellery = () => {
           <div style={{ display: "flex" }}>
             <table>
               <thead>
-              
+
                 <tr>
-                <th style={{fontSize:"13px"}}></th>
-                {storePriceFromAPI.map((e) => {
-                  return <th>
-                    <p style={{fontSize:"13px",margin:"0"}}>{e.metal}</p>
+                  <th style={{ fontSize: "13px" }}></th>
+                  {storePriceFromAPI.map((e) => {
+                    return <th>
+                      <p style={{ fontSize: "13px", margin: "0" }}>{e.metal}</p>
                     </th>
                   })}
-                 
-                  
+
+
                 </tr>
               </thead>
               <tbody>
-              <tr>
-              <td  style={{fontSize:"13px",margin:"0"}}>bid</td>
-              
-              {storePriceFromAPI.map((e) => {
-                return <td>
-                  <p style={{fontSize:"13px",margin:"0"}}>{e.currency.GBP.bid}</p>
-                  </td>
-                })}
+                <tr>
+                  <td style={{ fontSize: "13px", margin: "0" }}>bid</td>
+
+                  {storePriceFromAPI.map((e) => {
+                    return <td>
+                      <p style={{ fontSize: "13px", margin: "0" }}>{e.currency.GBP.bid}</p>
+                    </td>
+                  })}
                 </tr>
-              <tr>
-              <td style={{fontSize:"13px",margin:"0"}}>Offer</td>
-              
-              {storePriceFromAPI.map((e) => {
-                return <td>
-                  <p style={{fontSize:"13px",margin:"0"}}>{e.currency.GBP.offer}</p>
-                  </td>
-                })}
+                <tr>
+                  <td style={{ fontSize: "13px", margin: "0" }}>Offer</td>
+
+                  {storePriceFromAPI.map((e) => {
+                    return <td>
+                      <p style={{ fontSize: "13px", margin: "0" }}>{e.currency.GBP.offer}</p>
+                    </td>
+                  })}
                 </tr>
               </tbody>
             </table>
@@ -792,14 +798,15 @@ const Dashboard_jewellery = () => {
           justifyContent: "flex-end",
           padding: "inherit"
         }}>
-        
-        <Button variant="contained"
-        onClick={()=>{
-          navigate('/ClientData',{state:formValues})}
-        }
-        >Next</Button>
-        
-          
+
+          <Button variant="contained"
+            onClick={() => {
+              navigate('/ClientData', { state: formValues })
+            }
+            }
+          >Next</Button>
+
+
         </div>
       </div>
 
@@ -811,6 +818,8 @@ const Dashboard_jewellery = () => {
       >
         <CircularProgress color="inherit" />
       </Backdrop>
+
+     
     </>
   );
 };

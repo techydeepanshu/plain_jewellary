@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import ReactPDF,{ Document, Page, Text, View, StyleSheet, PDFViewer } from '@react-pdf/renderer';
+import ReactPDF, { Document, Page, Text, View, StyleSheet, PDFViewer,Image } from '@react-pdf/renderer';
 import Sidebar from '../Sidebar'
 import { Table, TableHeader, TableCell, TableBody, DataTableCell } from "@david.kucsai/react-pdf-table"
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -11,7 +11,8 @@ const styles = StyleSheet.create({
     },
     table: {
         width: '100%',
-        paddingBottom: "30px"
+        paddingBottom: "30px",
+        paddingTop: "30px"
     },
     row: {
         display: 'flex',
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     },
     // So Declarative and unDRY 👌
     row1: {
-        width: '27%',
+        width: '33%',
     },
     row2: {
         width: '15%',
@@ -61,8 +62,10 @@ const styles = StyleSheet.create({
 
 
 function PDF_Creation() {
-  
+
     const [showInvoice, setShowInvoice] = useState(false)
+    const [totalPrice, setTotalPrice] = useState(0)
+    const [totalWeight, setTotalWeight] = useState(0)
     const [customer_info, setCustomer_info] = useState(
         {
             "title": "wait..",
@@ -217,27 +220,52 @@ function PDF_Creation() {
     // let customer_info = location.state.customer_info
     // let products_info = location.state.products
 
-    console.log("loc : ", location)
+
 
     const MyDocument = () => (
 
         <Document>
             <Page size="A4" style={styles.page}>
 
-                <View style={{ display: "flex", justifyContent: "space-between", flexDirection: "row", paddingBottom: "30px" }}>
-                    <Text>INVOICE</Text>
-                    <Text>Muljis</Text>
+                <View style={{ display: "flex", justifyContent: "space-between", flexDirection: "row", paddingBottom: "30px" ,borderBottom:"2px solid grey"}}>
+                    <Image source="http://data.mjspos.co.uk/wp-content/uploads/2022/10/muljis_logo.jpg" style={{width:"50 px",height:"50 px"}}></Image>
+                    <View>
+                    <Text style={{fontSize:"29px",color:"red", alignSelf:"center"}}>MULJIS</Text>
+                    <Text style={{color:"red", alignSelf:"center"}}>Jewellers</Text>
+                    </View>
+                    
+                    <Image source="http://data.mjspos.co.uk/wp-content/uploads/2022/10/muljis_logo.jpg" style={{width:"50 px",height:"50 px"}}></Image>
                 </View>
 
                 <View style={styles.table}>
 
                     <View style={[styles.bold, styles.row]} wrap={false}>
-                        <Text style={styles.row1}>{customer_info.first_name}</Text>
-                        <Text style={styles.row1}>Order Number: 234232</Text>
-                        <Text style={styles.row1}>Order Date: 22/12/2022</Text>
+                        <Text style={styles.row1}>{customer_info.title} {customer_info.first_name} {customer_info.surname}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Order Number:</Text> {customer_info.order_id}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Order Date:</Text> {customer_info.TodayDate}</Text>
+                    </View>
+                    <View style={[styles.bold, styles.row]} wrap={false}>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>House Name:</Text> {customer_info.house_name}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>City/Town:</Text> {customer_info.city_and_town}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Postcode:</Text> {customer_info.postcode}</Text>
+                    </View>
+                    <View style={[styles.bold, styles.row]} wrap={false}>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Mobile:</Text> {customer_info.mobile}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Email:</Text> {customer_info.email}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Telephone:</Text> {customer_info.telephone}</Text>
                     </View>
 
-
+                    <Text style={{ fontSize: "13px" }}>Others Details:</Text>
+                    <View style={[styles.bold, styles.row]} wrap={false}>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Relation:</Text> {customer_info.relation_OD}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Name:</Text> {customer_info.name_OD} {customer_info.surname_OD}</Text>
+                        
+                    </View>
+                    <View style={[styles.bold, styles.row]} wrap={false}>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Email:</Text> {customer_info.email_OD}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Mobile:</Text> {customer_info.mobile_OD}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Comments:</Text> {customer_info.comments_OD}</Text>
+                    </View>
                 </View>
 
                 <Table
@@ -265,6 +293,38 @@ function PDF_Creation() {
 
                     </TableBody>
                 </Table>
+                <Table
+                    data={[{}]}
+                >
+                    
+                    <TableBody>
+                        <DataTableCell style={styles.productTableText} getContent={(r) => ""} />
+                        <DataTableCell style={styles.productTableText} getContent={(r) => ""} />
+                        <DataTableCell style={styles.productTableText} getContent={(r) => "Total Weight"} />
+                        <DataTableCell style={styles.productTableText} getContent={(r) => totalWeight.toFixed(2)} />
+                        <DataTableCell style={styles.productTableText} getContent={(r) => ""} />
+                        <DataTableCell style={styles.productTableText} getContent={(r) => ""} />
+                        <DataTableCell style={styles.productTableText} getContent={(r) => "Total Price"} />
+                        <DataTableCell style={styles.productTableText} getContent={(r) => totalPrice.toFixed(2)} />
+
+                    </TableBody>
+                </Table>
+
+                <View style={{ justifyContent: "center", flexDirection:"column", paddingBottom: "30px" }}>
+                
+                <View style={{paddingTop:"10px",paddingBottom:"10px"}}>
+                <View style={{alignSelf:"center",width:"100%",backgroundColor:"#A020F0",margin:"5px"}}><Text style={{fontSize:"10px",color:"#FFA500", alignSelf:"center",padding:"6px",alignSelf:"center"}}>PLATINUM</Text></View>
+                <View style={{alignSelf:"center",width:"100%",backgroundColor:"#A020F0",margin:"5px"}}><Text style={{fontSize:"10px",color:"#FFA500", alignSelf:"center",padding:"6px",alignSelf:"center"}}>GOLD</Text></View>
+                <View style={{alignSelf:"center",width:"100%",backgroundColor:"#A020F0",margin:"5px"}}><Text style={{fontSize:"10px",color:"#FFA500", alignSelf:"center",padding:"6px",alignSelf:"center"}}>FINE DIAMONDS</Text></View>
+                <Text style={{fontSize:"8px", alignSelf:"center"}}>We do not sell or share your personal data with anyone else. (GDPR COMPLIANT)</Text>
+                <Text style={{fontSize:"8px", alignSelf:"center"}}>216-218 Upper Tooting Road • London • SW17 7EW</Text>
+                <Text style={{fontSize:"8px", alignSelf:"center"}}>Tel: +44 (0)20 8767 8815 • Email: info@muljis.com •</Text>
+                
+                
+                </View>
+                
+                
+            </View>
             </Page>
         </Document>
     );
@@ -274,7 +334,7 @@ function PDF_Creation() {
 
             {showInvoice ? <PDFViewer style={{ height: "80vh", width: "78vw" }}>
 
-                <MyDocument/>
+                <MyDocument />
 
             </PDFViewer> : null}
 
@@ -294,15 +354,30 @@ function PDF_Creation() {
                 <Button variant="contained"
 
                     onClick={() => {
-                        // console.log("button : ", formData)
-                        //    navigate.goback()
-                        // navigate(-1)
-                        setCustomer_info(location.state.customer_info)
-                        setProducts_info(location.state.products)
-                        setShowInvoice(true)
+                        if(location.state!=null){
+
+                            // console.log("button : ", formData)
+                            //    navigate.goback()
+                            // navigate(-1)
+                            console.log("loc : ", location)
+                            let totalPriceTemp = 0;
+                            let totalWeightTemp = 0;
+                            location.state.products.map((e)=>{
+                                totalPriceTemp+=parseFloat(e.price)
+                                totalWeightTemp+=parseFloat(e.Wt_est)
+                            })
+                            
+                            setTotalPrice(totalPriceTemp);
+                            setTotalWeight(totalWeightTemp)
+                            setCustomer_info(location.state.customer_info)
+                            setProducts_info(location.state.products)
+                            setShowInvoice(true)
+                        }else{
+                            alert("Some Error Occured")
+                        }
                     }}
                 >Preview Invoice</Button>
-                
+
             </div>
         </>
     )

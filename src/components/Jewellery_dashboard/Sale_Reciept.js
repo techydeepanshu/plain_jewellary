@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import Sidebar from '../Sidebar'
 import styled from 'styled-components'
-import  {dataContext} from '../helpers/context'
+import { dataContext } from '../helpers/context'
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import Button from '@mui/material/Button';
 import { auth, firebase } from '../../firebase';
@@ -9,6 +9,13 @@ import TextField from '@mui/material/TextField';
 import { useLocation, useNavigate } from 'react-router-dom';
 import CircularProgress from '@mui/material/CircularProgress';
 import Backdrop from '@mui/material/Backdrop';
+import Autocomplete from '@mui/material/Autocomplete';
+import Select, {
+    components,
+    ControlProps,
+    Props,
+    StylesConfig,
+} from 'react-select';
 // import  "firebase/app";
 
 // import { getAuth, signInWithPhoneNumber ,RecaptchaVerifier} from "firebase/auth";
@@ -18,8 +25,8 @@ import Backdrop from '@mui/material/Backdrop';
 
 
 
-const ClientData = () => {
-    const { globleData,setGlobleData } = useContext(dataContext);
+const Sale_Reciept = () => {
+    const { globleData, setGlobleData } = useContext(dataContext);
 
 
     const [formData, setFormData] = useState({
@@ -47,6 +54,20 @@ const ClientData = () => {
         consent: false
 
     })
+    const [otherFormData, setOtherFormData] = useState({
+        Invoice_number:"123112",
+        Served_by:"",
+        Bank_amount:"",
+        Bank_remark:"",
+        Card_amount:"",
+        Card_remark:"",
+        Cash_amount:"",
+        Cash_remark:"",
+        Chaque_amount:"",
+        Chaque_remark:"",
+        Exchange_amount:"",
+        Exchange_remark:""
+    })
 
     const [formDataError, setFormDataError] = React.useState({
         first_nameErr: false,
@@ -61,9 +82,67 @@ const ClientData = () => {
     const [show, setshow] = useState(false);
     const [final, setfinal] = useState('');
     const [loader, setLoader] = useState(false)
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [allClinetData, setAllClinetData] = useState(null);
+    const [todayDate, setTodayDate] = useState("DD/MM/YYYY")
     const location = useLocation();
     const navigate = useNavigate();
-    console.log(globleData, "globleData")
+    useEffect(() => {
+        console.log("useEffect : ", globleData)
+        if (globleData != undefined) {
+
+            setFormData(globleData)
+        }
+
+        try {
+
+            let date = new Date();
+             setTodayDate(date.toLocaleDateString())
+            const getAllClientData = () => {
+
+                console.log(process.env.REACT_APP_SERVER_IP, "SERVER_IP")
+                setLoader(true)
+                fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/getclientdata`, {
+                    method: "post",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(formData)
+                })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        console.log("data > ", data.res)
+                        let temp = data.res.map((e)=>{
+                            return{
+                                ...e,
+                                label:`${e.client_id}_${e.first_name}_${e.mobile}`
+                            }
+                        })
+                        console.log("temp : ",temp)
+                        setAllClinetData(temp)
+
+                        setLoader(false)
+
+                    }).catch((err) => {
+                        alert("API not working");
+                        setLoader(false)
+                        throw Error(err)
+                    });
+
+                // console.log(data2, "all data");
+            };
+
+           
+
+            getAllClientData();
+
+        } catch (err) {
+            setLoader(false)
+            alert("Some Error Occurred");
+
+        }
+    }, []);
+
+
+    console.log(globleData, "globleData Plain_J_Invoice")
     console.log("location : ", location.state)
     const Select = styled.select`
     width:100%;
@@ -77,6 +156,14 @@ const ClientData = () => {
 
     function handleChange(key, value) {
         setFormData((prev) => {
+            return {
+                ...prev,
+                [key]: value
+            }
+        })
+    }
+    function handleChangeOtherData(key, value) {
+        setOtherFormData((prev) => {
             return {
                 ...prev,
                 [key]: value
@@ -186,73 +273,11 @@ const ClientData = () => {
     }
 
 
-    // const saveDataInDB =  () => {
-    //     console.log("formData : ", formData)
-
-    //     setLoader(true)
-    //    fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/insertclientdata`, {
-    //         method: "post",
-    //         headers: { "Content-Type": "application/json" },
-    //         body: JSON.stringify(formData)
-    //     }
-    //     )
-    //         .then((res) => res.json())
-    //         .then((data) => {
-    //             console.log("save client data > ", data)
-    //             if (data.success == false) {
-    //                 alert("API failed (save client data)")
-    //                 setLoader(false)
-    //             } else {
-    //                 alert("Data Insert Successfully")
-
-
-    //                 setFormData((prev) => {
-    //                     return { ...prev, client_id: parseInt(data.res.rows[0].client_id) }
-    //                 })
-    //                 fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/createorder`, {
-    //                     method: "post",
-    //                     headers: { "Content-Type": "application/json" },
-    //                     body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id) }, products: location.state })
-    //                 }
-    //                 )
-    //                     .then((res) => res.json())
-    //                     .then((response) => {
-    //                         console.log("craete order data > ", response)
-    //                         if (response.success == false) {
-    //                             alert("API failed (create order)")
-    //                             setLoader(false)
-    //                         } else {
-    //                             alert("Order created Successfully")
-
-
-                               
-                                    
-    //                                 navigate('/PDF_Creation', { state: { products: location.state, customer_info: { ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id) } } })
-                              
-    //                             setLoader(false)
-    //                         }
-    //                     }).catch((err) => {
-    //                         console.log(err);
-    //                         alert("API not working (createorder)")
-    //                         setLoader(false)
-    //                     });
-
-    //                 //    navigate('/PDF_Creation',{state:{products:location.state,customer_info:formData}})
-
-    //             }
-    //         }).catch((err) => {
-    //             console.log(err);
-    //             alert("API not working (insertclientdata)")
-    //             setLoader(false)
-    //         });
-
-    //     console.log("end")
-    // }
-    const saveDataInDB =  () => {
+    const saveDataInDB = () => {
         console.log("formData : ", formData)
 
         setLoader(true)
-       fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/insertclientdata`, {
+        fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/insertclientdata`, {
             method: "post",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(formData)
@@ -269,12 +294,12 @@ const ClientData = () => {
 
 
                     setFormData((prev) => {
-                        return { ...prev, client_id: parseInt(data.res.rows[0].client_id),TodayDate:location.state[0].TodayDate }
+                        return { ...prev, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }
                     })
                     fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/createorder`, {
                         method: "post",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id),TodayDate:location.state[0].TodayDate }, products: location.state })
+                        body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }, products: location.state })
                     }
                     )
                         .then((res) => res.json())
@@ -287,10 +312,10 @@ const ClientData = () => {
                                 alert("Order created Successfully")
 
 
-                                setGlobleData({ ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id),TodayDate:location.state[0].TodayDate })
-                                    console.log("trigger")
-                                    navigate('/PDF_Creation', { state: { products: location.state, customer_info: { ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id),TodayDate:location.state[0].TodayDate } } })
-                              
+                                setGlobleData({ ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate })
+                                console.log("trigger")
+                                navigate('/PDF_Creation', { state: { products: location.state, customer_info: { ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate } } })
+
                                 setLoader(false)
                             }
                         }).catch((err) => {
@@ -372,12 +397,23 @@ const ClientData = () => {
         notes_selected: row.notes_selected,
         product_size: row.product_size_selected
     }));
+
+    const Countries = [
+        { label: "Albania", value: 355 },
+        { label: "Argentina", value: 54 },
+        { label: "Austria", value: 43 },
+        { label: "Cocos Islands", value: 61 },
+        { label: "Kuwait", value: 965 },
+        { label: "Sweden", value: 46 },
+        { label: "Venezuela", value: 58 }
+    ];
+
     return (
         <>
             <Sidebar />
             <div className='container-fluid' style={{ backgroundColor: "" }}>
                 <div className="row">
-                    <p className='bg-secondary text-white py-2'>Client Data</p>
+                    <p className='bg-secondary text-white py-2'>Sale Reciept</p>
                 </div>
 
                 <form className='p-4' >
@@ -386,27 +422,43 @@ const ClientData = () => {
                             <div className="col-lg-6 g-0">
                                 <table className="table-border">
                                     <tbody>
-                                        <tr>
 
-                                            <th><b>Title</b></th>
-                                            <th>
-                                                <select class="form-control rounded-0" id="exampleFormControlSelect1"
-                                                    value={formData.title}
+                                        <tr>
+                                            <td ><b>CLINT ID</b></td>
+                                            <td >
+                                                {/*<select class="form-control rounded-0" id="exampleFormControlSelect1"
+                                                    // value={formData.title}
+                                                    value="13123"
                                                     onChange={(e) => {
                                                         handleChange("title", e.target.value)
                                                     }}
                                                 >
-                                                    <option>MR</option>
-                                                    <option>MRS</option>
-                                                    <option>MISS</option>
-                                                    <option>DR</option>
-                                                    <option>OTHER</option>
-                                                </select>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <td ><b>CLINT ID</b></td>
-                                            <td >XXXXXXX</td>
+                                                    <option>121_Deepanshu_7206685433</option>
+                                                    <option>123_Deepanshu_3221233222</option>
+
+                                                </select>*/}
+                                                <Autocomplete
+                                                    disablePortal
+                                                    id="combo-box-demo"
+                                                    options={allClinetData}
+                                                    // onChange={(e)=>{
+                                                    //     console.log("ek : ",e)
+                                                    //     // setFormData()
+                                                    // }}
+                                                    // getOptionLabel={(option) => {
+                                                    //     console.log("option : ",option)
+                                                    // }}
+                                                    onChange={(event, newValue) => {
+                                                        console.log("newValue : ",newValue);
+                                                        if(newValue!=null){
+
+                                                            setFormData(newValue)
+                                                        }
+                                                      }}
+                                                    sx={{ width: 200 }}
+                                                    renderInput={(params) => <TextField {...params} label="Select Client" />}
+                                                />
+                                            </td>
                                         </tr>
                                         <tr>
                                             <td scope="col"><b>First Name*</b></td>
@@ -441,8 +493,9 @@ const ClientData = () => {
                                                 }}
                                             ></TextField></td>
                                         </tr>
+                                      
                                         <tr>
-                                            <td scope="col"><b>House Name</b></td>
+                                            <td scope="col"><b>Road/Street</b></td>
                                             <td scope="col"><TextField
                                                 value={formData.house_name}
                                                 onChange={(e) => {
@@ -451,15 +504,7 @@ const ClientData = () => {
                                                 }}
                                             ></TextField></td>
                                         </tr>
-                                        <tr>
-                                            <td scope="col"><b>Address L2</b></td>
-                                            <td scope="col"><TextField
-                                                value={formData.address_l2}
-                                                onChange={(e) => {
-                                                    handleChange("address_l2", e.target.value)
-                                                }}
-                                            ></TextField></td>
-                                        </tr>
+
                                         <tr>
                                             <td scope="col"><b>City/Town</b></td>
                                             <td scope="col"><TextField
@@ -478,22 +523,7 @@ const ClientData = () => {
                                                 }}
                                             ></TextField></td>
                                         </tr>
-                                        <tr>
-                                            <td scope="col">Telephone*</td>
-                                            <td scope="col"><TextField
-                                                value={formData.telephone}
-                                                error={formDataError.telephoneErr}
-                                                onChange={(e) => {
-                                                    handleChange("telephone", e.target.value)
-                                                    if (e.target.value != "") {
-                                                        setFormDataError(prev => {
-                                                            // console.log("text : ",text)
-                                                            return { ...prev, telephoneErr: false };
-                                                        })
-                                                    }
-                                                }}
-                                            ></TextField></td>
-                                        </tr>
+
                                         <tr>
                                             <td scope="col"><b>Mobile*</b></td>
                                             <td scope="col"><TextField
@@ -533,89 +563,176 @@ const ClientData = () => {
                             <div className="col-lg-6 g-0">
                                 <table className="table-border">
                                     <tbody>
+
                                         <tr>
-                                            <td colspan="2"><b>Others Details:</b></td>
+                                            <td><b>Date:</b></td>
+                                            <td >{todayDate}</td>
                                         </tr>
                                         <tr>
-                                            <td><b>Relation</b></td>
-                                            <td ><select class="form-control rounded-0" id="exampleFormControlSelect1"
-                                                value={formData.relation_OD}
-                                                onChange={(e) => {
-                                                    handleChange("relation_OD", e.target.value)
-                                                }}
-                                            >
-                                                <option>PARTNER</option>
-                                                <option>WIFE</option>
-                                                <option>HUSBAND</option>
-                                                <option>FRIEND</option>
-                                                <option>EDITABLE AUTO ADD NEW</option>
-                                            </select></td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>Name</b></td>
+                                            <td><b>SR Number:</b></td>
                                             <td ><TextField
-                                                value={formData.name_OD}
+                                                value={otherFormData.Invoice_number}
                                                 onChange={(e) => {
-                                                    handleChange("name_OD", e.target.value)
+                                                    handleChangeOtherData("Invoice_number", e.target.value)
                                                 }}
                                             ></TextField></td>
                                         </tr>
+
                                         <tr>
-                                            <td><b>Surname</b></td>
-                                            <td ><TextField
-                                                value={formData.surname_OD}
-                                                onChange={(e) => {
-                                                    handleChange("surname_OD", e.target.value)
-                                                }}
-                                            ></TextField></td>
+                                            <td><b>SERVED BY</b></td>
+                                            <td > <Autocomplete
+                                            disablePortal
+                                            id="combo-box-demo"
+                                            options={[{label:"name1"},{label:"name2"},{label:"name3"},{label:"name4"},]}
+                                            // onChange={(e)=>{
+                                            //     console.log("ek : ",e)
+                                            //     // setFormData()
+                                            // }}
+                                            // getOptionLabel={(option) => {
+                                            //     console.log("option : ",option)
+                                            // }}
+                                            onChange={(event, newValue) => {
+                                                console.log("newValue : ",newValue);
+                                                if(newValue!=null){
+
+                                                    handleChangeOtherData("Served_by", newValue)
+                                                }
+                                              }}
+                                            sx={{ width: 200 }}
+                                            renderInput={(params) => <TextField {...params} label="Select Option" />}
+                                        /></td>
+                                        </tr>
+
+
+
+
+                                    </tbody>
+                                </table>
+                                <div className="col-lg-24 g-0">
+                                    <table className="table-border">
+                                        <tbody>
+
+
+                                            <tr>
+                                                <td><b>Payment Details</b></td>
+                                                <td><b>Amount</b></td>
+                                                <td><b>Remark</b></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>BANK</td>
+                                                <td ><TextField
+                                                    value={otherFormData.Bank_amount}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Bank_amount", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={otherFormData.Bank_remark}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Bank_remark", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                            <tr>
+                                                <td>CARD</td>
+                                                <td ><TextField
+                                                    value={otherFormData.Card_amount}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Card_amount", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={otherFormData.Card_remark}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Card_remark", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                            <tr>
+                                                <td>CASH</td>
+                                                <td ><TextField
+                                                    value={otherFormData.Cash_amount}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Cash_amount", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={otherFormData.Cash_remark}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Cash_remark", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                            <tr>
+                                                <td>CHEQUE</td>
+                                                <td ><TextField
+                                                    value={otherFormData.Chaque_amount}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Chaque_amount", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={otherFormData.Chaque_remark}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Chaque_remark", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                            <tr>
+                                                <td>EXCHANGE</td>
+                                                <td ><TextField
+                                                    value={otherFormData.Exchange_amount}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Exchange_amount", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                                <td ><TextField
+                                                    value={otherFormData.Exchange_remark}
+                                                    onChange={(e) => {
+                                                        handleChangeOtherData("Exchange_remark", e.target.value)
+                                                    }}
+                                                ></TextField></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+
+
+
+                        <div className="row">
+                            <div className="col-lg-24 g-0">
+                                <table className="table-border">
+                                    <tbody>
+
+
+                                        <tr>
+                                            <td><b></b></td>
+                                            <td><b>Total</b></td>
+                                            <td><b></b></td>
                                         </tr>
                                         <tr>
-                                            <td><b>Comments</b></td>
-                                            <td><TextField
-                                                value={formData.comments_OD}
-                                                onChange={(e) => {
-                                                    handleChange("comments_OD", e.target.value)
-                                                }}
-                                            ></TextField></td>
+                                            <td>1</td>
+                                            <td>PAYMENT RECEIVED </td>
+                                            <td></td>
                                         </tr>
                                         <tr>
-                                            <td><b>Mobile</b></td>
-                                            <td><TextField></TextField></td>
+                                            <td></td>
+                                            <td>WORDS AUTO </td>
+                                            <td></td>
                                         </tr>
-                                        <tr>
-                                            <td><b>Email</b></td>
-                                            <td><TextField
-                                                value={formData.email_OD}
-                                                onChange={(e) => {
-                                                    handleChange("email_OD", e.target.value)
-                                                }}
-                                            ></TextField></td>
-                                        </tr>
+
 
                                     </tbody>
                                 </table>
                             </div>
                         </div>
-                        <br />
-
                     </div>
                 </form>
 
-                {location.state ? (
-                    <DataGrid
-                        style={{ height: "28rem", width: "100%" }}
-                        rows={rows}
-                        columns={columns}
-                        pageSize={20}
-                        getRowId={(row) => row.item_id}
-                        rowsPerPageOptions={[20]}
-                        components={{ Toolbar: GridToolbar }}
-                    />
-                ) : (
-                    <center>
-                        <h2>Loading.... </h2>
-                    </center>
-                )}
                 <div className="row" style={{ padding: "30px 0 30px 0" }}>
                     <div className="col-12">
                         <b><input type="checkbox"
@@ -627,6 +744,7 @@ const ClientData = () => {
 
                     </div>
                 </div>
+                <Select options={Countries} />
                 <div style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -681,7 +799,7 @@ const ClientData = () => {
                                 alert("Form fill properly")
                             }
 
-                           
+
 
                         }}
                     >Next</Button>
@@ -699,4 +817,4 @@ const ClientData = () => {
     )
 }
 
-export default ClientData
+export default Sale_Reciept
