@@ -16,6 +16,8 @@ import Select, {
     Props,
     StylesConfig,
 } from 'react-select';
+import {Converter} from "any-number-to-words";
+const converter = new Converter();
 // import  "firebase/app";
 
 // import { getAuth, signInWithPhoneNumber ,RecaptchaVerifier} from "firebase/auth";
@@ -57,15 +59,15 @@ const Sale_Reciept = () => {
     const [otherFormData, setOtherFormData] = useState({
         Invoice_number:"123112",
         Served_by:"",
-        Bank_amount:"",
+        Bank_amount:0,
         Bank_remark:"",
-        Card_amount:"",
+        Card_amount:0,
         Card_remark:"",
-        Cash_amount:"",
+        Cash_amount:0,
         Cash_remark:"",
-        Chaque_amount:"",
+        Chaque_amount:0,
         Chaque_remark:"",
-        Exchange_amount:"",
+        Exchange_amount:0,
         Exchange_remark:""
     })
 
@@ -83,7 +85,29 @@ const Sale_Reciept = () => {
     const [final, setfinal] = useState('');
     const [loader, setLoader] = useState(false)
     const [selectedOption, setSelectedOption] = useState(null);
-    const [allClinetData, setAllClinetData] = useState(null);
+    const [totalPrice, setTotalPrice] = useState(0);
+    const [totalPriceInWord, setTotalPriceInWord] = useState(0);
+    const [allClinetData, setAllClinetData] = useState([{
+        "client_id": "2",
+        "title": "",
+        "first_name": "",
+        "surname": "",
+        "house_name": "",
+        "address_l2": "",
+        "city_and_town": "",
+        "postcode": "",
+        "telephone": "",
+        "mobile": "",
+        "email": "",
+        "relation_od": "",
+        "name_od": "",
+        "surname_od": "",
+        "comments_od": "",
+        "email_od": "",
+        "mobile_od": null,
+        "consent": true,
+        "label": "Select Option"
+    }]);
     const [todayDate, setTodayDate] = useState("DD/MM/YYYY")
     const location = useLocation();
     const navigate = useNavigate();
@@ -95,6 +119,9 @@ const Sale_Reciept = () => {
         }
 
         try {
+            let converNumber = converter.toWords(1000); 
+
+            console.log("coonverNumber : ",converNumber)
 
             let date = new Date();
              setTodayDate(date.toLocaleDateString())
@@ -129,8 +156,6 @@ const Sale_Reciept = () => {
 
                 // console.log(data2, "all data");
             };
-
-           
 
             getAllClientData();
 
@@ -169,6 +194,7 @@ const Sale_Reciept = () => {
                 [key]: value
             }
         })
+        
     }
 
     //     const configureCaptcha = () => {
@@ -296,7 +322,7 @@ const Sale_Reciept = () => {
                     setFormData((prev) => {
                         return { ...prev, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }
                     })
-                    fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/createorder`, {
+                    fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/createsalereciept`, {
                         method: "post",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }, products: location.state })
@@ -314,7 +340,7 @@ const Sale_Reciept = () => {
 
                                 setGlobleData({ ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate })
                                 console.log("trigger")
-                                navigate('/PDF_Creation', { state: { products: location.state, customer_info: { ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate } } })
+                                navigate('/PDF_Creation_Sale_Reciept', { state: {customer_info:{...formData,TodayDate:todayDate,...otherFormData,totalPrice:totalPrice,totalPriceInWord:converter.toWords(totalPriceInWord).toUpperCase()}}})
 
                                 setLoader(false)
                             }
@@ -398,15 +424,6 @@ const Sale_Reciept = () => {
         product_size: row.product_size_selected
     }));
 
-    const Countries = [
-        { label: "Albania", value: 355 },
-        { label: "Argentina", value: 54 },
-        { label: "Austria", value: 43 },
-        { label: "Cocos Islands", value: 61 },
-        { label: "Kuwait", value: 965 },
-        { label: "Sweden", value: 46 },
-        { label: "Venezuela", value: 58 }
-    ];
 
     return (
         <>
@@ -448,6 +465,7 @@ const Sale_Reciept = () => {
                                                     // getOptionLabel={(option) => {
                                                     //     console.log("option : ",option)
                                                     // }}
+                                                    value={formData.client_id}
                                                     onChange={(event, newValue) => {
                                                         console.log("newValue : ",newValue);
                                                         if(newValue!=null){
@@ -624,7 +642,15 @@ const Sale_Reciept = () => {
                                                 <td ><TextField
                                                     value={otherFormData.Bank_amount}
                                                     onChange={(e) => {
-                                                        handleChangeOtherData("Bank_amount", e.target.value)
+                                                        console.log("Bank_amount : ",typeof e.target.value)
+                                                        if(e.target.value != ""){
+
+                                                            handleChangeOtherData("Bank_amount", e.target.value)
+                                                            setTotalPrice(()=>parseFloat(e.target.value)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount))
+                                                            setTotalPriceInWord(()=>parseFloat(e.target.value)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount))
+                                                        }else{
+                                                            handleChangeOtherData("Bank_amount", 0)
+                                                        }
                                                     }}
                                                 ></TextField></td>
                                                 <td ><TextField
@@ -639,7 +665,14 @@ const Sale_Reciept = () => {
                                                 <td ><TextField
                                                     value={otherFormData.Card_amount}
                                                     onChange={(e) => {
-                                                        handleChangeOtherData("Card_amount", e.target.value)
+                                                        if(e.target.value != ""){
+
+                                                            handleChangeOtherData("Card_amount", e.target.value)
+                                                            setTotalPrice(()=>parseFloat(otherFormData.Bank_amount)+parseFloat(e.target.value)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount))
+                                                            setTotalPriceInWord(()=>parseFloat(otherFormData.Bank_amount)+parseFloat(e.target.value)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount))
+                                                        }else{
+                                                            handleChangeOtherData("Card_amount", 0)
+                                                        }
                                                     }}
                                                 ></TextField></td>
                                                 <td ><TextField
@@ -654,7 +687,14 @@ const Sale_Reciept = () => {
                                                 <td ><TextField
                                                     value={otherFormData.Cash_amount}
                                                     onChange={(e) => {
-                                                        handleChangeOtherData("Cash_amount", e.target.value)
+                                                        if(e.target.value != ""){
+
+                                                            handleChangeOtherData("Cash_amount", e.target.value)
+                                                            setTotalPrice(()=>parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(e.target.value)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount))
+                                                            setTotalPriceInWord(()=>parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(e.target.value)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount))
+                                                        }else{
+                                                            handleChangeOtherData("Cash_amount", 0)
+                                                        }
                                                     }}
                                                 ></TextField></td>
                                                 <td ><TextField
@@ -669,7 +709,14 @@ const Sale_Reciept = () => {
                                                 <td ><TextField
                                                     value={otherFormData.Chaque_amount}
                                                     onChange={(e) => {
-                                                        handleChangeOtherData("Chaque_amount", e.target.value)
+                                                        if(e.target.value != ""){
+
+                                                            handleChangeOtherData("Chaque_amount", e.target.value)
+                                                            setTotalPrice(()=>parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(e.target.value)+parseFloat(otherFormData.Exchange_amount))
+                                                            setTotalPriceInWord(()=>parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(e.target.value)+parseFloat(otherFormData.Exchange_amount))
+                                                        }else{
+                                                            handleChangeOtherData("Chaque_amount", 0)
+                                                        }
                                                     }}
                                                 ></TextField></td>
                                                 <td ><TextField
@@ -684,7 +731,15 @@ const Sale_Reciept = () => {
                                                 <td ><TextField
                                                     value={otherFormData.Exchange_amount}
                                                     onChange={(e) => {
-                                                        handleChangeOtherData("Exchange_amount", e.target.value)
+                                                        if(e.target.value != ""){
+
+                                                            handleChangeOtherData("Exchange_amount", e.target.value)
+                                                            setTotalPrice(()=>parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(e.target.value))
+                                                            setTotalPriceInWord(()=>parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(e.target.value))
+                                                        }else{
+                                                            handleChangeOtherData("Exchange_amount", 0)
+                                                        }
+                                                        // console.log("typeof : ",typeof (parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(e.target.value)))
                                                     }}
                                                 ></TextField></td>
                                                 <td ><TextField
@@ -721,8 +776,8 @@ const Sale_Reciept = () => {
                                         </tr>
                                         <tr>
                                             <td></td>
-                                            <td>WORDS AUTO </td>
-                                            <td></td>
+                                            <td>{converter.toWords(parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount)).toUpperCase()}</td>
+                                            <td>€{parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount)}</td>
                                         </tr>
 
 
@@ -744,7 +799,7 @@ const Sale_Reciept = () => {
 
                     </div>
                 </div>
-                <Select options={Countries} />
+            
                 <div style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -761,6 +816,15 @@ const Sale_Reciept = () => {
                     <Button variant="contained"
                         disabled={!formData.consent}
                         onClick={() => {
+                            console.log("totalPriceInWord : ",parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount))
+                            console.log(parseFloat(otherFormData.Bank_amount))
+                            console.log(parseFloat(otherFormData.Card_amount))
+                            console.log(parseFloat(otherFormData.Card_amount))
+                            console.log(parseFloat(otherFormData.Cash_amount))
+                            console.log(parseFloat(otherFormData.Chaque_amount))
+                            console.log(parseFloat(otherFormData.Exchange_amount))
+                            console.log(otherFormData)
+                            console.log("convert : ",converter.toWords(parseFloat(otherFormData.Bank_amount)+parseFloat(otherFormData.Card_amount)+parseFloat(otherFormData.Cash_amount)+parseFloat(otherFormData.Chaque_amount)+parseFloat(otherFormData.Exchange_amount)))
                             console.log("button : ", formData)
                             // signin()
                             // signin()
@@ -793,11 +857,14 @@ const Sale_Reciept = () => {
                             }
                             if (formData.first_name !== "" && formData.surname !== "" && formData.mobile !== "" && formData.email !== "") {
 
-                                setOrderData({ customer_info: formData, products: location.state })
+                                // setOrderData({ customer_info: formData, products: location.state })
                                 saveDataInDB()
+
+                                // navigate('/PDF_Creation_Sale_Reciept', { state: {customer_info:{...formData,TodayDate:todayDate,...otherFormData,totalPrice:totalPrice,totalPriceInWord:converter.toWords(totalPriceInWord).toUpperCase()}}})
                             } else {
                                 alert("Form fill properly")
                             }
+                            
 
 
 
