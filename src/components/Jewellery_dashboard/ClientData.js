@@ -23,7 +23,7 @@ const ClientData = () => {
 
 
     const [formData, setFormData] = useState({
-        title: "MR",
+        title: "Mr",
         client_id: "XXXXXXX",
         first_name: "",
         surname: "",
@@ -32,7 +32,7 @@ const ClientData = () => {
         city_and_town: "",
         postcode: "",
         telephone: "",
-        mobile: "+917206685433",
+        mobile: "",
         email: "",
 
 
@@ -396,11 +396,11 @@ const ClientData = () => {
                                                         handleChange("title", e.target.value)
                                                     }}
                                                 >
-                                                    <option>MR</option>
-                                                    <option>MRS</option>
-                                                    <option>MISS</option>
-                                                    <option>DR</option>
-                                                    <option>OTHER</option>
+                                                    <option>Mr</option>
+                                                    <option>Mrs</option>
+                                                    <option>Miss</option>
+                                                    <option>Dr</option>
+                                                    <option>Other</option>
                                                 </select>
                                             </th>
                                         </tr>

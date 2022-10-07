@@ -32,7 +32,7 @@ const Sale_Reciept = () => {
 
 
     const [formData, setFormData] = useState({
-        title: "MR",
+        title: "Mr",
         client_id: "XXXXXXX",
         first_name: "",
         surname: "",
@@ -41,23 +41,17 @@ const Sale_Reciept = () => {
         city_and_town: "",
         postcode: "",
         telephone: "",
-        mobile: "+917206685433",
+        mobile: "",
         email: "",
 
 
         // other_details
 
-        relation_OD: "",
-        name_OD: "",
-        surname_OD: "",
-        comments_OD: "",
-        email_OD: "",
-        mobile_OD: "",
         consent: false
 
     })
     const [otherFormData, setOtherFormData] = useState({
-        Invoice_number:"123112",
+        Invoice_number:"",
         Served_by:"",
         Bank_amount:0,
         Bank_remark:"",
@@ -319,17 +313,16 @@ const Sale_Reciept = () => {
                     alert("Data Insert Successfully")
 
 
-                    setFormData((prev) => {
-                        return { ...prev, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }
-                    })
+                    // setFormData((prev) => {
+                    //     return { ...prev, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }
+                    // })
                     fetch(`http://${process.env.REACT_APP_SERVER_IP}:4000/createsalereciept`, {
                         method: "post",
                         headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate }, products: location.state })
+                        body: JSON.stringify({ customer_info: { ...formData, client_id: parseInt(data.res.rows[0].client_id), date: todayDate ,...otherFormData,totalPrice:totalPrice,totalPriceInWord:converter.toWords(totalPriceInWord).toUpperCase()}})
                     }
-                    )
-                        .then((res) => res.json())
-                        .then((response) => {
+                    ).then((res) => res.json())
+                     .then((response) => {
                             console.log("craete order data > ", response)
                             if (response.success == false) {
                                 alert("API failed (create order)")
@@ -338,9 +331,9 @@ const Sale_Reciept = () => {
                                 alert("Order created Successfully")
 
 
-                                setGlobleData({ ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate })
+                                // setGlobleData({ ...formData, order_id: parseInt(response.res.rows[0].order_id), client_id: parseInt(data.res.rows[0].client_id), TodayDate: location.state[0].TodayDate })
                                 console.log("trigger")
-                                navigate('/PDF_Creation_Sale_Reciept', { state: {customer_info:{...formData,TodayDate:todayDate,...otherFormData,totalPrice:totalPrice,totalPriceInWord:converter.toWords(totalPriceInWord).toUpperCase()}}})
+                                navigate('/PDF_Creation_Sale_Reciept', { state: {customer_info:{...formData,sr_number:parseInt(response.res.rows[0].sale_reciept_id),TodayDate:todayDate,...otherFormData,totalPrice:totalPrice,totalPriceInWord:converter.toWords(totalPriceInWord).toUpperCase()}}})
 
                                 setLoader(false)
                             }
@@ -470,7 +463,7 @@ const Sale_Reciept = () => {
                                                         console.log("newValue : ",newValue);
                                                         if(newValue!=null){
 
-                                                            setFormData(newValue)
+                                                            setFormData({...newValue,consent:false})
                                                         }
                                                       }}
                                                     sx={{ width: 200 }}

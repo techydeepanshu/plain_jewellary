@@ -227,11 +227,12 @@ function PDF_Creation_Sale_Reciept() {
         <Document>
             <Page size="A4" style={styles.page}>
 
-                <View style={{ display: "flex", justifyContent: "space-between", flexDirection: "row", paddingBottom: "30px", borderBottom: "2px solid grey" }}>
+                <View style={{ display: "flex", justifyContent: "space-between", flexDirection: "row", paddingBottom: "11px", borderBottom: "2px solid grey" }}>
                     <Image source="http://data.mjspos.co.uk/wp-content/uploads/2022/10/muljis_logo.jpg" style={{ width: "50 px", height: "50 px" }}></Image>
                     <View>
                         <Text style={{ fontSize: "29px", color: "red", alignSelf: "center" }}>MULJIS</Text>
                         <Text style={{ color: "red", alignSelf: "center" }}>Jewellers</Text>
+                        <Text style={{ color: "red", alignSelf: "center" ,padding:"10px"}}>SALE RECIEPT</Text>
                     </View>
 
                     <Image source="http://data.mjspos.co.uk/wp-content/uploads/2022/10/muljis_logo.jpg" style={{ width: "50 px", height: "50 px" }}></Image>
@@ -241,7 +242,7 @@ function PDF_Creation_Sale_Reciept() {
 
                     <View style={[styles.bold, styles.row]} wrap={false}>
                         <Text style={styles.row1}>{customer_info.title} {customer_info.first_name} {customer_info.surname}</Text>
-                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>SR Number:</Text> {customer_info.order_id}</Text>
+                        <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>SR Number: {customer_info.sr_number}</Text> {customer_info.order_id}</Text>
                         <Text style={styles.row1}><Text style={{ fontWeight: "900" }}>Date:</Text> {customer_info.TodayDate}</Text>
                     </View>
                     <View style={[styles.bold, styles.row]} wrap={false}>

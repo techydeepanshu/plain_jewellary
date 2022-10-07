@@ -62,13 +62,7 @@ export default function Jewellery_dashboard(props) {
                     <Links to='/' >Dashboard</Links>
                 </ListItem>
             </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <JoinFull />
-                    <Links to='/Plain_J_Invoice' >Plain J Invoice</Links>
-                </ListItem>
-            </List>
+            
             <Divider />
             <List>
                 <ListItem>
@@ -80,14 +74,7 @@ export default function Jewellery_dashboard(props) {
             <List>
                 <ListItem>
                     <JoinFull />
-                    <Links to='/ClientData' >Client Data</Links>
-                </ListItem>
-            </List>
-            <Divider />
-            <List>
-                <ListItem>
-                    <JoinFull />
-                    <Links to='/PDF_Creation' >PDF Creation</Links>
+                    <Links to='/Plain_J_Invoice' >Plain J Invoice</Links>
                 </ListItem>
             </List>
             <Divider />
