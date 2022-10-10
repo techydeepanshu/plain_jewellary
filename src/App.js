@@ -19,6 +19,7 @@ import { dataContext } from "./components/helpers/context";
 import Plain_J_Invoice from "./components/Jewellery_dashboard/Plain_J_Invoice";
 import Sale_Reciept from "./components/Jewellery_dashboard/Sale_Reciept";
 import PDF_Creation_Sale_Reciept from "./components/Jewellery_dashboard/PDF_Creation_Sale_Reciept";
+import Goods_In from "./components/Jewellery_dashboard/Goods_In";
 const drawerWidth = 280;
 
   function App() {
@@ -60,6 +61,7 @@ const drawerWidth = 280;
         <Route path="/Plain_J_Invoice" element={<Plain_J_Invoice />} />
         <Route path="/Sale_Reciept" element={<Sale_Reciept />} />
         <Route path="/PDF_Creation_Sale_Reciept" element={<PDF_Creation_Sale_Reciept />} />
+        <Route path="/Goods_In" element={<Goods_In />} />
 
       </Routes>
     </Router>

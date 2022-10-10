@@ -74,6 +74,13 @@ export default function Jewellery_dashboard(props) {
             <List>
                 <ListItem>
                     <JoinFull />
+                    <Links to='/Goods_In' >Goods In</Links>
+                </ListItem>
+            </List>
+            <Divider />
+            <List>
+                <ListItem>
+                    <JoinFull />
                     <Links to='/Plain_J_Invoice' >Plain J Invoice</Links>
                 </ListItem>
             </List>
